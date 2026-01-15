@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SB Dinámicas-Premium</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700;900&display=swap" rel="stylesheet">
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root{
+      --bg:#ffffff;
+      --bg2:#fafafa;
+      --text:#0b0b0d;
+      --muted:#6b7280;
+      --card: rgba(255,255,255,0.92);
+      --stroke: rgba(0,0,0,0.08);
+      --red:#e11d48;
+      --red2:#ff0033;
+      --shadow: 0 14px 45px rgba(17, 24, 39, 0.12);
+      --radius: 22px;
+      --green:#16a34a;
+      --yellow:#f59e0b;
+      --blue:#2563eb;
+      --purple:#8b5cf6;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      font-family:'Poppins', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height:100vh;
+      overflow-x:hidden;
+      display:flex;
+      flex-direction:column;
+      transition: .25s ease;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+
+    .text-dim{ color: var(--muted) !important; }
+    .break-word{ word-break: break-word; }
+
+    .glass-card{
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition:.25s ease;
+    }
+
+    .btn-primary{
+      background: linear-gradient(90deg, var(--red), var(--red2)) !important;
+      border:none !important;
+      box-shadow: 0 14px 30px rgba(225,29,72,.22);
+      font-weight:900;
+      border-radius: 999px !important;
+    }
+
+    .form-control, .form-select{
+      border-radius:14px !important;
+      border: 1px solid var(--stroke) !important;
+      background: rgba(255,255,255,.95) !important;
+      color: #0b0b0d !important;
+      padding:12px 14px;
+    }
+
+    .progress{
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.06);
+      overflow:hidden;
+    }
+    .progress-bar{
+      background: linear-gradient(90deg, var(--red), var(--red2)) !important;
+    }
+
+    /* selector rifa */
+    .raffle-picker{
+      display:flex; gap:10px; flex-wrap:wrap;
+      justify-content:center;
+      padding: 12px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      background: rgba(0,0,0,.03);
+    }
+    .raffle-pill{
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background: var(--card);
+      padding: 10px 14px;
+      font-weight: 900;
+      cursor:pointer;
+      transition:.2s ease;
+      display:flex; gap:10px; align-items:center;
+    }
+    .raffle-pill:hover{ transform: translateY(-2px); }
+    .raffle-pill.active{
+      border-color: rgba(225,29,72,.45);
+      box-shadow: 0 12px 28px rgba(225,29,72,.14);
+    }
+
+    .number-badge{
+      display:inline-flex; align-items:center; justify-content:center;
+      min-width:44px;
+      padding:10px 14px;
+      margin:6px 6px 0 0;
+      border-radius:999px;
+      font-weight:900;
+      background: linear-gradient(135deg, var(--red), var(--red2));
+      color:#fff;
+      box-shadow: 0 10px 25px rgba(225,29,72,.25);
+    }
+
+    .credits-footer{
+      margin-top:auto;
+      text-align:center;
+      padding: 20px 12px;
+      font-size:.9rem;
+      color: var(--muted);
+    }
+    .credits-footer a{
+      text-decoration:none;
+      font-weight:900;
+      color: var(--red);
+    }
+
+    .info-chip{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      background: rgba(0,0,0,.03);
+      font-weight:800;
+      font-size: .82rem;
+    }
+
+    .admin-mini{
+      position:fixed;
+      bottom:18px;
+      left:18px;
+      z-index:2000;
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .admin-fab{
+      width:52px;height:52px;border-radius:999px;
+      background: var(--card);
+      border:1px solid var(--stroke);
+      box-shadow: 0 14px 28px rgba(0,0,0,.12);
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    .admin-fab:hover{ transform: translateY(-2px); }
+    .admin-fab i{ color: var(--red); }
+
+    /* Admin premium styles */
+    .admin-tab-btn{
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      padding:10px 14px;
+      font-weight:900;
+      cursor:pointer;
+      background: var(--card);
+      transition:.2s ease;
+    }
+    .admin-tab-btn.active{
+      border-color: rgba(225,29,72,.50);
+      box-shadow: 0 12px 26px rgba(225,29,72,.18);
+    }
+    .mini-muted{ font-size:12px; font-weight:800; color: var(--muted); }
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-weight:900;
+      font-size:12px;
+      padding:3px 8px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background: rgba(0,0,0,.04);
+      display:inline-block;
+    }
+
+    /* Estilos para números premiados en el MODAL */
+    .premium-number-card {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(124, 58, 237, 0.05));
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      border-radius: 16px;
+      padding: 15px;
+      margin-bottom: 10px;
+      transition: transform 0.2s;
+    }
+    .premium-number-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(139, 92, 246, 0.15);
+    }
+    .premium-number {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--purple);
+      text-align: center;
+      margin-bottom: 5px;
+    }
+    .premium-prize {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      text-align: center;
+    }
+    .premium-badge {
+      background: linear-gradient(135deg, var(--purple), #7c3aed);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    /* Indicador en el botón si hay premios */
+    .premium-indicator {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #ff4757;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+    }
+
+    /* ====================== FAB STACK IZQUIERDA ====================== */
+    .fab-stack-left{
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 1040;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .fab-mini{
+      width: 52px;
+      height: 52px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: .25s ease;
+      cursor: pointer;
+      position: relative;
+    }
+    .fab-mini i{ font-size: 18px; }
+
+    .fab-mini.premium{
+      background: linear-gradient(135deg, var(--purple), #7c3aed);
+      color: #fff;
+      box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+      border: none;
+    }
+    .fab-mini.premium:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(139, 92, 246, 0.4);
+    }
+    .fab-mini.search{
+      background: var(--card);
+      color: var(--red);
+      box-shadow: 0 10px 25px rgba(225, 29, 72, 0.18);
+    }
+    .fab-mini.search:hover{
+      transform: translateY(-2px);
+      background: rgba(225,29,72,.06);
+    }
+
+    /* ====================== BUY FAB DERECHA ====================== */
+    .buy-fab{
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1040;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      background: linear-gradient(135deg, var(--red), var(--red2));
+      color: white;
+      padding: 10px 16px;
+      font-weight: 900;
+      box-shadow: 0 10px 25px rgba(225, 29, 72, 0.30);
+      transition: .25s ease;
+      border: none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+    }
+    .buy-fab:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(225, 29, 72, 0.38);
+    }
+
+    /* Botones compactos de compra (modal) */
+    .buy-card{
+      cursor:pointer;
+      border-radius: 20px;
+      padding: 14px;
+      text-align:center;
+      min-height: 110px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      transition: .2s ease;
+    }
+    .buy-card:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 18px 40px rgba(225,29,72,.15);
+      border-color: rgba(225,29,72,.35);
+    }
+    .buy-top{
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      gap:10px;
+    }
+    .buy-qty{
+      font-weight: 900;
+      font-size: 2rem;
+      line-height: 1;
+      color: var(--text);
+    }
+    .buy-meta{
+      font-weight: 900;
+      font-size: .95rem;
+      color: var(--muted);
+      padding-bottom: 2px;
+    }
+    .buy-price{
+      font-weight: 900;
+      color:#fff;
+      background: linear-gradient(90deg,var(--red),var(--red2));
+      padding: 8px 10px;
+      border-radius: 999px;
+      display:block;
+      width:100%;
+      font-size: .95rem;
+    }
+    /* ===================== LOGO CIRCULAR PREMIUM ===================== */
+.sb-logo-wrap{
+  width: 170px;
+  height: 170px;
+  margin: 0 auto;
+  border-radius: 999px;
+  background: #ffffff;
+
+  /* borde rojo premium */
+  border: 4px solid var(--red2);
+
+  /* sombra elegante */
+  box-shadow:
+    0 12px 25px rgba(225, 29, 72, 0.20),
+    0 3px 10px rgba(0, 0, 0, 0.08);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sb-logo{
+  width: 145px;
+  height: 145px;
+  border-radius: 999px;
+  object-fit: cover;
+  display: block;
+
+  /* borde interno blanco */
+  border: 3px solid #ffffff;
+}
+/* ================================================================= */
+  </style>
+</head>
+
+<body>
+
+  <!-- STACK IZQUIERDA: Premiados + Mis Boletas -->
+  <div class="fab-stack-left">
+    <button class="fab-mini premium" onclick="openPremiumNumbersModal()" title="Números Premiados" id="premiumButton">
+      <i class="fa-solid fa-trophy"></i>
+      <span id="premiumIndicator" class="premium-indicator d-none"></span>
+    </button>
+
+    <button class="fab-mini search"
+      title="Mis Boletas"
+      data-bs-toggle="modal"
+      data-bs-target="#searchModal"
+      onclick="cleanSearch()">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <!-- Si prefieres boleta:
+      <i class="fa-solid fa-ticket"></i>
+      -->
+    </button>
+  </div>
+
+  <!-- Botón flotante COMPRAR (derecha) -->
+  <button class="buy-fab" onclick="openBuyPanel()" title="Comprar oportunidades">
+    <i class="fa-solid fa-cart-shopping"></i>
+    <span>Comprar</span>
+  </button>
+
+  <!-- Admin FAB -->
+  <div class="admin-mini">
+    <div class="admin-fab" onclick="openAdminModal()" title="Admin">
+      <i class="fa-solid fa-user-shield"></i>
+    </div>
+  </div>
+
+  <div class="container py-5" style="max-width: 820px; margin-top: 22px;">
+    <div class="text-center mb-4">
+  <div class="sb-logo-wrap">
+    <img src="/logo-sb.png" id="displayLogo" class="sb-logo" alt="SB Dinámicas">
+  </div>
+</div>
+    <!-- selector de rifa visible -->
+    <div class="glass-card p-3 mb-3">
+      <div class="text-center fw-black mb-2" style="font-weight:900;">
+        <i class="fa-solid fa-layer-group me-2" style="color:var(--red)"></i> Selecciona tu dinámica
+      </div>
+      <div id="rafflePicker" class="raffle-picker"></div>
+      <div class="text-center text-dim small mt-2">
+        Tu compra se registra en la dinámica seleccionada.
+      </div>
+    </div>
+
+    <!-- info -->
+    <div class="glass-card p-4 mb-4">
+      <div id="loading" class="text-center py-5">
+        <div class="spinner-border" style="color: var(--red);"></div>
+        <div class="mt-2">Cargando dinámica...</div>
+      </div>
+
+      <div id="contentInfo" class="d-none">
+        <img id="mainImage" src="" class="img-fluid rounded mb-3 d-none" style="width:100%; max-height:350px; object-fit:contain;">
+        <h2 id="title" class="text-center text-uppercase mb-2" style="font-weight: 900;">SORTEO PREMIUM</h2>
+        <p id="desc" class="text-center mb-3 text-dim" style="white-space: pre-line;">...</p>
+        <div id="raffleInfo" class="d-flex flex-wrap justify-content-center gap-2 mb-4"></div>
+
+        <div class="progress">
+          <div id="progBar" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
+        </div>
+        <div class="d-flex justify-content-between mt-2 small">
+          <span id="progText" style="font-weight:900;">0%</span>
+          <span id="statsText" class="text-dim">Cargando...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ compra en frontend eliminada (queda SOLO en botón Comprar) -->
+    <div id="clientView" class="d-none"></div>
+
+  </div>
+
+  <div class="credits-footer">
+    <a href="https://wa.link/ff25i1" target="_blank">SB DINÁMICAS PREMIUM</a>
+  </div>
+
+  <!-- MODAL DE NÚMEROS PREMIADOS -->
+  <div class="modal fade" id="premiumNumbersModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content glass-card p-1" style="max-width: 500px;">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold" style="color: var(--purple);">
+            <i class="fa-solid fa-crown me-2"></i> Números Premiados
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="premiumNumbersContent"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ BUY PANEL MODAL (COMPRA TUS OPORTUNIDADES) -->
+  <div class="modal fade" id="buyPanelModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+      <div class="modal-content glass-card p-1">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold">
+            <i class="fa-solid fa-ticket me-2" style="color:var(--red)"></i>
+            Compra tus oportunidades
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="text-center text-dim small mb-3">
+            Selecciona cuántas boletas quieres comprar
+          </div>
+          <div id="buttonsContainerModal" class="row g-3 justify-content-center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUY MODAL -->
+  <div class="modal fade" id="buyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content glass-card p-1">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold">Confirmar Compra</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="text-center mb-3">
+            <h3 id="modalLabel" class="fw-bold" style="color: var(--red);">...</h3>
+            <div class="fs-2 fw-bold" id="modalPrice">$0</div>
+            <small class="text-dim">Por <span id="modalQty">0</span> boletas</small>
+          </div>
+
+          <form id="orderForm">
+            <input type="hidden" id="orderQty"><input type="hidden" id="orderTotal">
+            <label class="small fw-bold ms-2">Tu Nombre Completo</label>
+            <input type="text" id="clientName" class="form-control mb-3" placeholder="Ej: Juan Pérez" required>
+            <label class="small fw-bold ms-2">Tu WhatsApp</label>
+            <input type="number" id="clientPhone" class="form-control mb-3" placeholder="Ej: 3001234567" required>
+
+            <button type="submit" class="btn btn-primary w-100 fw-bold py-2">
+              <i class="fa-solid fa-bolt me-2"></i> APARTAR Y PAGAR
+            </button>
+          </form>
+
+          <div class="text-dim small text-center mt-3">
+            Se asignan números aleatorios y pagas con Nequi.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEQUI PAY MODAL -->
+  <div class="modal fade" id="nequiModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content glass-card p-1">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold"><i class="fa-solid fa-qrcode me-2"></i>Pagar con Nequi</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="glass-card p-3 mb-3">
+            <div class="text-center mb-3">
+              <div class="fw-bold">Total a pagar</div>
+              <div id="nequiTotal" class="fs-2 fw-black" style="font-weight:900;color:var(--red);">$0</div>
+              <div class="text-dim small">Paga el valor exacto</div>
+            </div>
+
+            <div class="text-center">
+              <div style="background:#fff;border-radius:20px;padding:14px;display:inline-block;box-shadow:0 18px 45px rgba(0,0,0,.18);">
+                <img id="nequiQrImg"
+                  src="./nequi-qr.png"
+                  alt="QR Nequi"
+                  onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=3183406852'"
+                  style="width:240px;height:240px;object-fit:contain;"
+                />
+              </div>
+            </div>
+
+            <div class="text-center mt-3">
+              <div class="text-dim small">Titular</div>
+              <div class="fw-black" style="font-weight:900;">SAM...BER...</div>
+            </div>
+
+            <div class="mt-3 p-3 rounded-4 border" style="border-color: var(--stroke); cursor:pointer;"
+                onclick="copyNequiNumber()">
+              <div class="text-dim small" style="font-weight:800;">Toca para copiar el número</div>
+              <div class="d-flex justify-content-center align-items-center gap-3 mt-1">
+                <div class="fs-4" style="font-weight:900; letter-spacing:2px;">318 340 6852</div>
+                <i class="fa-regular fa-copy" style="color: var(--red);"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card p-3 mb-3">
+            <div class="fw-bold mb-1">Tus números asignados</div>
+            <div id="nequiNumbers" class="small text-dim">...</div>
+          </div>
+
+          <a id="btnSendProof" target="_blank" class="btn btn-success w-100 rounded-pill fw-black py-3"
+             style="font-weight:900;">
+            <i class="fa-brands fa-whatsapp me-2"></i> Enviar comprobante
+          </a>
+
+          <div class="text-center mt-3 text-dim small">
+            Después de pagar, envía el comprobante por WhatsApp para aprobar tus números.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEARCH MODAL -->
+  <div class="modal fade" id="searchModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content glass-card p-1">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold">Buscar mis números</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <label class="small fw-bold ms-2 mb-1">Ingresa tu número de celular</label>
+          <input type="number" id="searchPhoneInput" class="form-control mb-3" placeholder="Ej: 3001234567">
+          <button class="btn btn-primary w-100 mb-3" onclick="performSearch()">Buscar</button>
+          <div id="searchResults" class="text-center"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN MODAL (login) -->
+  <div class="modal fade" id="adminModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content glass-card p-1">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold"><i class="fa-solid fa-user-shield me-2"></i>Admin</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+
+          <div id="adminLoggedBox" class="d-none">
+            <div class="glass-card p-3 mb-3">
+              <div class="fw-bold">Sesión iniciada</div>
+              <div id="adminEmail" class="text-dim small">...</div>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button class="btn btn-primary" onclick="openAdminPanel()">
+                <i class="fa-solid fa-gear me-2"></i> Panel Admin Premium
+              </button>
+              <button class="btn btn-outline-danger fw-bold" onclick="adminLogout()">
+                <i class="fa-solid fa-right-from-bracket me-2"></i> Cerrar sesión
+              </button>
+            </div>
+          </div>
+
+          <div id="adminLoginBox">
+            <div class="text-dim small mb-2">Ingresa con tu correo y contraseña (Supabase Auth).</div>
+            <input id="adminEmailInput" type="email" class="form-control mb-2" placeholder="Correo admin">
+            <input id="adminPassInput" type="password" class="form-control mb-3" placeholder="Contraseña">
+            <button class="btn btn-primary w-100" onclick="adminLogin()">
+              <i class="fa-solid fa-lock me-2"></i> Entrar
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ ADMIN PANEL PREMIUM CON NÚMEROS PREMIADOS -->
+  <div class="modal fade" id="adminPanelModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down modal-xl">
+      <div class="modal-content glass-card p-1">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold">
+            <i class="fa-solid fa-screwdriver-wrench me-2"></i> Panel Admin Premium
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+
+          <!-- Tabs -->
+          <div class="d-flex gap-2 flex-wrap mb-3">
+            <div class="admin-tab-btn active" id="tabBtnOrders" onclick="adminShowTab('orders')">
+              <i class="fa-solid fa-receipt me-2" style="color:var(--red)"></i> Pedidos
+            </div>
+            <div class="admin-tab-btn" id="tabBtnRaffles" onclick="adminShowTab('raffles')">
+              <i class="fa-solid fa-layer-group me-2" style="color:var(--red)"></i> Rifas
+            </div>
+            <div class="admin-tab-btn" id="tabBtnPremium" onclick="adminShowTab('premium')">
+              <i class="fa-solid fa-crown me-2" style="color:var(--purple)"></i> Premios
+            </div>
+            <div class="admin-tab-btn" id="tabBtnWinner" onclick="adminShowTab('winner')">
+              <i class="fa-solid fa-trophy me-2" style="color:var(--red)"></i> Ganador
+            </div>
+          </div>
+
+          <!-- ================= TAB: Pedidos ================= -->
+          <div id="adminTabOrders">
+            <div class="glass-card p-3 mb-3">
+              <div class="fw-bold mb-1">Pedidos pendientes</div>
+              <div class="mini-muted">Aprueba pagos / libera números.</div>
+              <div id="adminOrdersList" class="text-dim small mt-2">Cargando...</div>
+            </div>
+
+            <div class="d-grid">
+              <button class="btn btn-dark fw-bold" onclick="openPresentationMode()">
+                <i class="fa-solid fa-tv me-2"></i> Modo Presentación
+              </button>
+            </div>
+          </div>
+
+          <!-- ================= TAB: Rifas ================= -->
+          <div id="adminTabRaffles" class="d-none">
+            <div class="row g-3">
+              <div class="col-12 col-lg-4">
+                <div class="glass-card p-3">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="fw-bold">Mis Rifas</div>
+                    <button class="btn btn-primary btn-sm" onclick="adminCreateRaffle()">
+                      <i class="fa-solid fa-plus me-2"></i>Nueva
+                    </button>
+                  </div>
+                  <div class="mini-muted mb-2">Toca una rifa para editar.</div>
+                  <div id="adminRafflesList" class="small text-dim">Cargando...</div>
+                </div>
+              </div>
+
+              <div class="col-12 col-lg-8">
+                <div class="glass-card p-3">
+                  <div class="fw-bold mb-2">Editar Rifa</div>
+                  <div class="mini-muted mb-3">
+                    Configuración premium: 100 ó 1000 números, título, lotería, fecha, imagen, botones.
+                  </div>
+
+                  <div id="adminEditDisabled" class="text-center text-dim p-4">
+                    Selecciona una rifa para editar.
+                  </div>
+
+                  <div id="adminEditForm" class="d-none">
+                    <div class="row g-2">
+                      <div class="col-12 col-md-6">
+                        <label class="small fw-bold ms-2">Nombre (selector)</label>
+                        <input id="rf_nombre" class="form-control" placeholder="Ej: Dinámica Flash">
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="small fw-bold ms-2">Activa</label>
+                        <select id="rf_active" class="form-select">
+                          <option value="true">Activa</option>
+                          <option value="false">Inactiva</option>
+                        </select>
+                      </div>
+
+                      <div class="col-12 col-md-6">
+                        <label class="small fw-bold ms-2">Total números</label>
+                        <select id="rf_total" class="form-select">
+                          <option value="100">100 (00-99)</option>
+                          <option value="1000">1000 (000-999)</option>
+                        </select>
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="small fw-bold ms-2">Precio unitario</label>
+                        <input id="rf_precio" type="number" class="form-control" placeholder="Ej: 5000">
+                      </div>
+
+                      <div class="col-12">
+                        <label class="small fw-bold ms-2">Título principal</label>
+                        <input id="rf_titulo" class="form-control" placeholder="Ej: SORTEO PREMIUM">
+                      </div>
+                      <div class="col-12">
+                        <label class="small fw-bold ms-2">Descripción</label>
+                        <textarea id="rf_desc" class="form-control" rows="3" placeholder="Descripción visible"></textarea>
+                      </div>
+
+                      <div class="col-12 col-md-6">
+                        <label class="small fw-bold ms-2">Título rifa</label>
+                        <input id="rf_titulo_rifa" class="form-control" placeholder="Ej: Moto 2026">
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="small fw-bold ms-2">Premio</label>
+                        <input id="rf_premio" class="form-control" placeholder="Ej: Moto + Casco">
+                      </div>
+
+                      <div class="col-12 col-md-6">
+                        <label class="small fw-bold ms-2">Fecha sorteo</label>
+                        <input id="rf_fecha" class="form-control" placeholder="Ej: 30/01/2026">
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="small fw-bold ms-2">Lotería</label>
+                        <input id="rf_loteria" class="form-control" placeholder="Ej: Lotería de Medellín">
+                      </div>
+
+                      <div class="col-12 col-md-6">
+                        <label class="small fw-bold ms-2">Imagen URL (opcional)</label>
+                        <input id="rf_img_url" class="form-control" placeholder="https://...">
+                      </div>
+                      <div class="col-12 col-md-6">
+                        <label class="small fw-bold ms-2">Subir imagen premio (galería)</label>
+                        <input id="rf_img_file" type="file" accept="image/*" class="form-control">
+                      </div>
+
+                      <div class="col-12">
+                        <div class="glass-card p-2">
+                          <div class="d-flex justify-content-between align-items-center">
+                            <div class="fw-bold">Botones de compra</div>
+                            <div class="d-flex gap-2">
+                              <button class="btn btn-outline-dark btn-sm fw-bold" onclick="adminButtonsAdd()">
+                                <i class="fa-solid fa-plus me-2"></i>Agregar botón
+                              </button>
+                              <button class="btn btn-outline-danger btn-sm fw-bold" onclick="adminButtonsResetDefault()">
+                                <i class="fa-solid fa-rotate-left me-2"></i>Default
+                              </button>
+                            </div>
+                          </div>
+                          <div class="mini-muted mt-1">Puedes tener hasta 10 botones (o más).</div>
+                          <div id="adminButtonsList" class="mt-2"></div>
+                          <div class="mini-muted mt-2">
+                            JSON final: <span class="kbd">botones_json</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-12 d-grid gap-2 mt-2">
+                        <button class="btn btn-primary py-3" onclick="adminSaveRaffle()">
+                          <i class="fa-solid fa-floppy-disk me-2"></i> Guardar cambios
+                        </button>
+                        <button class="btn btn-outline-danger fw-bold" onclick="adminDeleteRaffle()">
+                          <i class="fa-solid fa-trash me-2"></i> Eliminar rifa
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- ================= TAB: Números Premiados ================= -->
+          <div id="adminTabPremium" class="d-none">
+            <div class="glass-card p-3 mb-3">
+              <div class="fw-bold mb-2" style="color: var(--purple);">
+                <i class="fa-solid fa-crown me-2"></i> Configurar Números Premiados
+              </div>
+              <div class="mini-muted mb-3">
+                Puedes configurar hasta 4 números premiados por rifa. Cada número tiene un premio especial.
+              </div>
+
+              <div class="row g-3">
+                <div class="col-12">
+                  <div class="glass-card p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                      <div class="fw-bold">Números Premiados (Máx 4)</div>
+                      <button class="btn btn-primary" onclick="addPremiumNumber()" id="addPremiumBtn">
+                        <i class="fa-solid fa-plus me-2"></i> Agregar Número
+                      </button>
+                    </div>
+
+                    <div id="premiumNumbersContainer" class="mb-3"></div>
+
+                    <div class="text-center">
+                      <button class="btn btn-success w-100 py-3 fw-bold" onclick="savePremiumNumbers()">
+                        <i class="fa-solid fa-floppy-disk me-2"></i> GUARDAR NÚMEROS PREMIADOS
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="glass-card p-3">
+                    <div class="fw-bold mb-2">Vista Previa</div>
+                    <div class="mini-muted mb-3">Así verán los usuarios los números premiados en el modal:</div>
+                    <div id="premiumPreview" class="row g-3"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= TAB: Ganador ================= -->
+          <div id="adminTabWinner" class="d-none">
+            <div class="glass-card p-3 mb-2">
+              <div class="fw-bold mb-2">Número ganador</div>
+              <div class="d-flex gap-2 flex-wrap">
+                <input id="winnerInput" type="number" class="form-control" style="max-width:220px;" placeholder="Ej: 12 ó 120">
+                <button class="btn btn-primary" onclick="setWinnerNumber()">
+                  <i class="fa-solid fa-trophy me-2"></i> Guardar ganador
+                </button>
+                <button class="btn btn-outline-danger fw-bold" onclick="clearWinnerNumber()">
+                  <i class="fa-solid fa-trash me-2"></i> Quitar ganador
+                </button>
+              </div>
+              <div class="text-dim small mt-2">
+                Se muestra en modo presentación.
+              </div>
+            </div>
+
+            <div class="d-grid mt-3">
+              <button class="btn btn-dark fw-bold" onclick="openPresentationMode()">
+                <i class="fa-solid fa-tv me-2"></i> Modo Presentación
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRESENTATION FULLSCREEN -->
+  <div class="modal fade" id="presentationModal" tabindex="-1">
+    <div class="modal-dialog modal-fullscreen">
+      <div class="modal-content" style="background:#000;color:#fff;">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold"><i class="fa-solid fa-tv me-2"></i>Modo Presentación</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body d-flex flex-column justify-content-center align-items-center text-center">
+
+          <div style="font-weight:900;font-size:clamp(22px,4vw,44px);">
+            <span id="presRaffleName">Dinámicas</span>
+          </div>
+          <div class="text-white-50 mb-4">Transparencia SB Dinámicas</div>
+
+          <div style="font-weight:900;font-size:clamp(80px,14vw,180px); color: #22c55e;">
+            <span id="presWinner">---</span>
+          </div>
+
+          <div class="text-white-50 mb-4">Número ganador</div>
+
+          <div class="glass-card p-3" style="max-width: 900px; width:100%; background: rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.15);">
+            <div class="fw-bold mb-2">Estado en vivo</div>
+            <div id="presStats" class="text-white-50">...</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+/***********************
+ * CONFIG
+ ************************/
+const SUPABASE_URL = "https://nuodfziwwbueprqijknb.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_3dkb5TRchHKB6mPVDcntuA_9HjbpFor";
+
+const NEQUI_NUMBER = "3183406852";
+const NEQUI_WA_ADMIN = "573215714548";
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let raffles = [];
+let selectedRaffle = null;
+let isAdmin = false;
+
+let adminSelectedRaffleId = null;
+let adminButtonsModel = [];
+let adminPremiumNumbers = [];
+
+/***********************
+ * HELPERS
+ ************************/
+function getNumDigits(){
+  const total = parseInt(selectedRaffle?.total_numeros || 100);
+  return total === 1000 ? 3 : 2;
+}
+function formatNumber(n){
+  return String(n).padStart(getNumDigits(), "0");
+}
+function money(n){ return "$" + Number(n||0).toLocaleString(); }
+
+/***********************
+ * BUY PANEL
+ ************************/
+function openBuyPanel(){
+  renderButtonsToModal();
+  new bootstrap.Modal(document.getElementById('buyPanelModal')).show();
+}
+
+/***********************
+ * INIT
+ ************************/
+document.addEventListener("DOMContentLoaded", async ()=>{
+  await boot();
+  subscribeRealtime();
+});
+
+async function boot(){
+  document.getElementById("loading").classList.remove("d-none");
+  document.getElementById("contentInfo").classList.add("d-none");
+
+  await loadRaffles();
+  if(!raffles.length){
+    alert("No hay rifas creadas. Revisa Supabase.");
+    return;
+  }
+  selectedRaffle = raffles[0];
+  renderRafflePicker();
+  await renderAll();
+}
+
+async function loadRaffles(){
+  const {data, error} = await sb.from("raffles").select("*").eq("is_active", true).order("created_at");
+  if(error){
+    console.error(error);
+    alert("Error cargando rifas: " + error.message);
+    return;
+  }
+  raffles = data || [];
+}
+
+function renderRafflePicker(){
+  const div = document.getElementById("rafflePicker");
+  div.innerHTML = "";
+
+  raffles.forEach(r=>{
+    const pill = document.createElement("div");
+    pill.className = "raffle-pill " + (selectedRaffle?.id === r.id ? "active" : "");
+    pill.innerHTML = `
+      <i class="fa-solid fa-ticket" style="color:var(--red)"></i>
+      <div>
+        <div style="font-weight:900; line-height:1;">${r.nombre}</div>
+        <div class="text-dim" style="font-size:12px; font-weight:800;">
+          ${r.total_numeros === 1000 ? "000-999" : "00-99"} · ${money(r.precio_unitario)}
+        </div>
+      </div>
+    `;
+    pill.onclick = async ()=>{
+      selectedRaffle = r;
+      renderRafflePicker();
+      await renderAll();
+    };
+    div.appendChild(pill);
+  });
+}
+
+async function renderAll(){
+  await refreshSelectedRaffleFromDB();
+  document.getElementById("loading").classList.add("d-none");
+  document.getElementById("contentInfo").classList.remove("d-none");
+  document.getElementById("clientView").classList.remove("d-none");
+
+  renderHeader();
+  await renderStats();
+  await refreshAdminUI();
+
+  updatePremiumButtonIndicator();
+}
+
+async function refreshSelectedRaffleFromDB(){
+  if(!selectedRaffle?.id) return;
+  const {data, error} = await sb.from("raffles").select("*").eq("id", selectedRaffle.id).single();
+  if(!error && data) selectedRaffle = data;
+}
+
+/***********************
+ * HEADER
+ ************************/
+function renderHeader(){
+  document.getElementById("title").innerText = selectedRaffle.titulo || "SB Dinámicas";
+  document.getElementById("desc").innerText = selectedRaffle.descripcion || "";
+
+  const img = document.getElementById("mainImage");
+  if(selectedRaffle.imagen_premio_base64){
+    img.src = selectedRaffle.imagen_premio_base64;
+    img.classList.remove("d-none");
+  } else if(selectedRaffle.imagen_url){
+    img.src = selectedRaffle.imagen_url;
+    img.classList.remove("d-none");
+  } else {
+    img.classList.add("d-none");
+  }
+
+  const info = [];
+  if(selectedRaffle.titulo_rifa) info.push(`<span class="info-chip"><i class="fa-solid fa-trophy" style="color:var(--red)"></i>${selectedRaffle.titulo_rifa}</span>`);
+  if(selectedRaffle.descripcion_premio) info.push(`<span class="info-chip"><i class="fa-solid fa-gift" style="color:var(--red)"></i>${selectedRaffle.descripcion_premio}</span>`);
+  if(selectedRaffle.fecha_sorteo) info.push(`<span class="info-chip"><i class="fa-solid fa-calendar" style="color:var(--red)"></i>${selectedRaffle.fecha_sorteo}</span>`);
+  if(selectedRaffle.loteria) info.push(`<span class="info-chip"><i class="fa-solid fa-ticket" style="color:var(--red)"></i>${selectedRaffle.loteria}</span>`);
+  document.getElementById("raffleInfo").innerHTML = info.join("");
+}
+
+/***********************
+ * PREMIUM NUMBERS
+ ************************/
+function updatePremiumButtonIndicator(){
+  const indicator = document.getElementById("premiumIndicator");
+  const premiumNumbers = selectedRaffle?.premium_numbers || [];
+
+  if(premiumNumbers.length > 0){
+    indicator.classList.remove("d-none");
+    indicator.textContent = premiumNumbers.length;
+  } else {
+    indicator.classList.add("d-none");
+  }
+}
+
+async function openPremiumNumbersModal(){
+  const modal = new bootstrap.Modal(document.getElementById('premiumNumbersModal'));
+  const contentDiv = document.getElementById('premiumNumbersContent');
+
+  contentDiv.innerHTML = `
+    <div class="text-center py-4">
+      <div class="spinner-border" style="color: var(--purple);"></div>
+      <p class="text-dim mt-2">Cargando números premiados...</p>
+    </div>
+  `;
+
+  modal.show();
+
+  const {data, error} = await sb
+    .from('raffles')
+    .select('premium_numbers')
+    .eq('id', selectedRaffle.id)
+    .single();
+
+  if(error){
+    contentDiv.innerHTML = `
+      <div class="text-center py-4">
+        <i class="fa-solid fa-exclamation-triangle fa-3x mb-3" style="color:var(--red)"></i>
+        <p class="text-dim">Error cargando números premiados.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const premiumNumbers = data?.premium_numbers || [];
+
+  if(premiumNumbers.length === 0){
+    contentDiv.innerHTML = `
+      <div class="text-center py-4">
+        <i class="fa-solid fa-trophy fa-3x mb-3" style="color:var(--muted)"></i>
+        <p class="fw-bold mb-2">${selectedRaffle.nombre}</p>
+        <p class="text-dim">Esta dinámica no tiene números premiados configurados.</p>
+      </div>
+    `;
+  } else {
+    let html = `
+      <div class="text-center mb-4">
+        <h6 class="fw-bold mb-1">${selectedRaffle.nombre}</h6>
+        <p class="text-dim small">${premiumNumbers.length} número(s) premiado(s)</p>
+      </div>
+      <div class="row g-3">
+    `;
+
+    premiumNumbers.forEach((item, index) => {
+      html += `
+        <div class="col-6">
+          <div class="premium-number-card">
+            <div class="premium-number">${formatNumber(item.number)}</div>
+            <div class="premium-prize">${item.prize}</div>
+            <div class="text-center mt-2">
+              <span class="premium-badge">Premio #${index + 1}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    html += `
+      </div>
+      <div class="text-center mt-4">
+        <p class="text-dim small">
+          <i class="fa-solid fa-info-circle me-1"></i>
+          Si alguno de tus números asignados coincide con estos, ¡ganas el premio adicional!
+        </p>
+      </div>
+    `;
+
+    contentDiv.innerHTML = html;
+  }
+}
+
+/***********************
+ * BUTTONS -> MODAL
+ ************************/
+function renderButtonsToModal(){
+  const unitPrice = Number(selectedRaffle.precio_unitario || 0);
+  const btnContainer = document.getElementById("buttonsContainerModal");
+  if(!btnContainer) return;
+
+  btnContainer.innerHTML = "";
+
+  let buttons = [];
+  try { buttons = JSON.parse(selectedRaffle.botones_json || "[]"); } catch(e) {}
+  if(!buttons.length) buttons = [
+    {qty: 1, label:"x1"},
+    {qty: 3, label:"x3"},
+    {qty: 5, label:"x5"},
+    {qty: 10, label:"x10"},
+  ];
+
+  buttons.forEach(btn=>{
+    const cost = btn.qty * unitPrice;
+
+    btnContainer.innerHTML += `
+      <div class="col-6 col-md-4">
+        <div class="buy-card glass-card" onclick="openBuyModal(${btn.qty}, '${btn.label}', ${cost})">
+          <div class="buy-top">
+            <div class="buy-qty">${btn.qty}</div>
+            <div class="buy-meta">${btn.label}</div>
+          </div>
+          <div class="buy-price">${money(cost)}</div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+/***********************
+ * STATS
+ ************************/
+async function fetchStats(){
+  try {
+    const {data, error} = await sb
+      .from("order_numbers")
+      .select("numero,estado")
+      .eq("raffle_id", selectedRaffle.id);
+
+    if(error) return {paid:0, total:100, percent:0};
+
+    const paid = (data||[]).filter(x=>x.estado === "pagado").length;
+    const total = selectedRaffle.total_numeros === 1000 ? 1000 : 100;
+    const percent = total ? Math.round((paid/total)*100) : 0;
+
+    return {paid, total, percent};
+  } catch(e){
+    return {paid:0, total:100, percent:0};
+  }
+}
+
+async function renderStats(){
+  const {paid, total, percent} = await fetchStats();
+
+  document.getElementById("progBar").style.width = percent + "%";
+  document.getElementById("progText").innerText = percent + "%";
+  document.getElementById("statsText").innerText = `${paid} / ${total} Vendidos`;
+}
+
+/***********************
+ * COMPRAR
+ ************************/
+function openBuyModal(qty, label, total){
+  document.getElementById('modalQty').innerText = qty;
+  document.getElementById('modalLabel').innerText = label;
+  document.getElementById('modalPrice').innerText = money(total);
+  document.getElementById('orderQty').value = qty;
+  document.getElementById('orderTotal').value = total;
+
+  // cerrar panel de compra si estaba abierto
+  const bp = bootstrap.Modal.getInstance(document.getElementById("buyPanelModal"));
+  if(bp) bp.hide();
+
+  if(selectedRaffle.premium_numbers && selectedRaffle.premium_numbers.length > 0){
+    setTimeout(() => {
+      alert("🎉 ¡ATENCIÓN! Esta dinámica tiene números premiados especiales. Haz clic en el botón morado para verlos.");
+    }, 250);
+  }
+
+  new bootstrap.Modal(document.getElementById('buyModal')).show();
+}
+
+document.getElementById("orderForm").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const btn = e.target.querySelector("button");
+  const old = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerText = "Apartando números...";
+
+  try{
+    const qty = parseInt(document.getElementById("orderQty").value);
+    const name = document.getElementById("clientName").value.trim();
+    const phone = document.getElementById("clientPhone").value.trim();
+
+    if(!selectedRaffle?.id) throw new Error("Selecciona una rifa");
+
+    const {data, error} = await sb.rpc("create_order_random_numbers",{
+      p_raffle_id: selectedRaffle.id,
+      p_qty: qty,
+      p_nombre: name,
+      p_telefono: phone
+    });
+
+    if(error) throw error;
+
+    bootstrap.Modal.getInstance(document.getElementById("buyModal")).hide();
+
+    const premiumNumbers = selectedRaffle.premium_numbers || [];
+    const premiumNumbersList = premiumNumbers.map(p => p.number);
+    const assignedNumbers = data.numeros || [];
+    const winningNumbers = assignedNumbers.filter(num => premiumNumbersList.includes(num));
+
+    openNequiPayModal({
+      order_id: data.order_id,
+      nombre_cliente: name,
+      telefono_cliente: phone,
+      total_pagar: data.total_pagar,
+      numeros: data.numeros,
+      winning_numbers: winningNumbers
+    });
+
+    await renderStats();
+
+  }catch(err){
+    console.error(err);
+    alert("Error: " + (err.message || err));
+  }finally{
+    btn.disabled = false;
+    btn.innerHTML = old;
+  }
+});
+
+function copyNequiNumber(){
+  navigator.clipboard.writeText(NEQUI_NUMBER);
+  alert("✅ Número Nequi copiado");
+}
+
+function openNequiPayModal(payload){
+  const total = Number(payload.total_pagar);
+  document.getElementById("nequiTotal").innerText = money(total);
+
+  // limpiar tarjeta premiados previa
+  document.querySelectorAll("#nequiModal .premium-win-card").forEach(x => x.remove());
+
+  const normalNumbers = payload.numeros || [];
+  document.getElementById("nequiNumbers").innerHTML =
+    normalNumbers.map(n => `<span class="number-badge">${formatNumber(n)}</span>`).join("");
+
+  const premiumNumbers = selectedRaffle.premium_numbers || [];
+  const premiumNumbersList = premiumNumbers.map(p => p.number);
+  const winningNumbers = normalNumbers.filter(num => premiumNumbersList.includes(num));
+
+  if(winningNumbers.length > 0){
+    const winningDiv = document.createElement("div");
+    winningDiv.className = "glass-card p-3 mt-3 premium-win-card";
+    winningDiv.style.borderColor = "var(--purple)";
+    winningDiv.style.background = "linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(124, 58, 237, 0.05))";
+
+    let winningInfo = `<div class="fw-bold mb-2" style="color: var(--purple);">
+      <i class="fa-solid fa-crown me-2"></i>¡FELICIDADES! Tienes ${winningNumbers.length} número(s) premiado(s)
+    </div>`;
+
+    winningNumbers.forEach(num => {
+      const premiumNumber = premiumNumbers.find(p => p.number === num);
+      winningInfo += `<div class="mb-1">🎯 Número <span class="fw-bold">${formatNumber(num)}</span> - Premio: <span class="fw-bold">${premiumNumber?.prize || "Premio Especial"}</span></div>`;
+    });
+
+    winningDiv.innerHTML = winningInfo;
+    document.querySelector("#nequiModal .modal-body").insertBefore(winningDiv, document.getElementById("btnSendProof"));
+  }
+
+  const msg =
+`Hola SB DINÁMICAS ✅
+Ya realicé el pago por Nequi.
+
+🎯 Dinámica: ${selectedRaffle.nombre}
+👤 Nombre: ${payload.nombre_cliente}
+📱 Teléfono: ${payload.telefono_cliente}
+🎟️ Números: ${normalNumbers.map(n=>formatNumber(n)).join(", ")}
+💰 Total: ${money(total)}
+${payload.winning_numbers && payload.winning_numbers.length > 0 ? `\n🎉 Números Premiados: ${payload.winning_numbers.map(n=>formatNumber(n)).join(", ")}` : ''}
+
+Adjunto comprobante.`;
+
+  document.getElementById("btnSendProof").href =
+    `https://wa.me/${NEQUI_WA_ADMIN}?text=${encodeURIComponent(msg)}`;
+
+  new bootstrap.Modal(document.getElementById("nequiModal")).show();
+}
+
+/***********************
+ * SEARCH
+ ************************/
+function cleanSearch(){
+  document.getElementById("searchResults").innerHTML = "";
+  document.getElementById("searchPhoneInput").value = "";
+}
+
+async function performSearch(){
+  const phone = document.getElementById("searchPhoneInput").value.trim();
+  const div = document.getElementById("searchResults");
+  div.innerHTML = "";
+
+  if(!phone){
+    div.innerHTML = `<div style="color:var(--red);font-weight:900;">Ingresa un número</div>`;
+    return;
+  }
+
+  const {data: orders, error} = await sb
+    .from("orders")
+    .select("id,estado")
+    .eq("raffle_id", selectedRaffle.id)
+    .eq("telefono_cliente", phone)
+    .eq("estado", "aprobado")
+    .order("created_at", {ascending:false});
+
+  if(error){
+    div.innerHTML = `<div class="text-dim">Error buscando.</div>`;
+    return;
+  }
+
+  if(!orders || !orders.length){
+    div.innerHTML = `<div class="text-dim">No hay boletas pagadas con ese número en esta dinámica.</div>`;
+    return;
+  }
+
+  const orderIds = orders.map(o=>o.id);
+  const {data:numbers} = await sb
+    .from("order_numbers")
+    .select("numero,order_id,estado")
+    .eq("raffle_id", selectedRaffle.id)
+    .in("order_id", orderIds)
+    .eq("estado","pagado");
+
+  const nums = (numbers||[]).map(x=>Number(x.numero)).sort((a,b)=>a-b);
+
+  div.innerHTML = `
+    <div class="fw-bold mb-2" style="color:#16a34a;">¡Encontrados ${nums.length} números!</div>
+    <div class="mb-3">${nums.map(n => `<span class="number-badge">${formatNumber(n)}</span>`).join("")}</div>
+    <div class="small">Estado: <span class="badge bg-success">PAGADO</span></div>
+  `;
+}
+
+/***********************
+ * REALTIME
+ ************************/
+function subscribeRealtime(){
+  sb.channel("sb-dinamicas-live")
+    .on("postgres_changes", {event:"*", schema:"public", table:"order_numbers"}, async (payload)=>{
+      if(payload?.new?.raffle_id && selectedRaffle?.id && payload.new.raffle_id !== selectedRaffle.id) return;
+      await renderStats();
+    })
+    .on("postgres_changes", {event:"UPDATE", schema:"public", table:"raffles"}, async (payload)=>{
+      if(payload?.new?.id && selectedRaffle?.id && payload.new.id !== selectedRaffle.id) return;
+      await refreshSelectedRaffleFromDB();
+      renderHeader();
+      updatePremiumButtonIndicator();
+    })
+    .subscribe();
+}
+
+/***********************
+ * ADMIN
+ ************************/
+function openAdminModal(){
+  new bootstrap.Modal(document.getElementById("adminModal")).show();
+  refreshAdminUI();
+}
+
+async function refreshAdminUI(){
+  const {data:{user}} = await sb.auth.getUser();
+  const logged = !!user;
+
+  document.getElementById("adminLoginBox").classList.toggle("d-none", logged);
+  document.getElementById("adminLoggedBox").classList.toggle("d-none", !logged);
+  document.getElementById("adminEmail").innerText = user?.email || "";
+
+  isAdmin = false;
+  if(user){
+    const {data: adm} = await sb.from("admin_users").select("id").eq("id", user.id).maybeSingle();
+    isAdmin = !!adm;
+  }
+}
+
+async function adminLogin(){
+  const email = document.getElementById("adminEmailInput").value.trim();
+  const pass  = document.getElementById("adminPassInput").value.trim();
+  if(!email || !pass) return alert("Ingresa correo y contraseña");
+
+  const {error} = await sb.auth.signInWithPassword({email, password:pass});
+  if(error) return alert("Error login: " + error.message);
+
+  await refreshAdminUI();
+  alert("✅ Sesión iniciada");
+}
+
+async function adminLogout(){
+  await sb.auth.signOut();
+  await refreshAdminUI();
+  alert("✅ Sesión cerrada");
+}
+
+/* Tabs */
+function adminShowTab(tab){
+  const tabs = ["orders","raffles","premium","winner"];
+  tabs.forEach(t=>{
+    document.getElementById("adminTab"+capitalize(t)).classList.toggle("d-none", t!==tab);
+    document.getElementById("tabBtn"+capitalize(t)).classList.toggle("active", t===tab);
+  });
+
+  if(tab==="orders") loadPendingOrders();
+  if(tab==="raffles") adminLoadRafflesList();
+  if(tab==="premium") loadPremiumNumbersAdmin();
+}
+function capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+function openAdminPanel(){
+  if(!isAdmin){
+    alert("No eres admin autorizado.");
+    return;
+  }
+  bootstrap.Modal.getInstance(document.getElementById("adminModal")).hide();
+  new bootstrap.Modal(document.getElementById("adminPanelModal")).show();
+  adminShowTab("orders");
+}
+
+/***********************
+ * ADMIN: Pedidos pendientes
+ ************************/
+async function loadPendingOrders(){
+  const box = document.getElementById("adminOrdersList");
+  box.innerHTML = "Cargando...";
+
+  const {data, error} = await sb
+    .from("orders")
+    .select("*")
+    .eq("raffle_id", selectedRaffle.id)
+    .eq("estado","pendiente")
+    .order("created_at", {ascending:false});
+
+  if(error){
+    box.innerHTML = "Error cargando pedidos.";
+    return;
+  }
+
+  if(!data || !data.length){
+    box.innerHTML = `<div class="text-dim">No hay pedidos pendientes.</div>`;
+    return;
+  }
+
+  box.innerHTML = "";
+  for(const o of data){
+    const {data: nums} = await sb
+      .from("order_numbers")
+      .select("numero,estado")
+      .eq("raffle_id", selectedRaffle.id)
+      .eq("order_id", o.id)
+      .order("numero");
+
+    const formattedNums = (nums||[]).map(x=>formatNumber(Number(x.numero))).join(", ");
+
+    box.innerHTML += `
+      <div class="glass-card p-3 mb-2">
+        <div class="d-flex justify-content-between">
+          <b>${o.nombre_cliente}</b>
+          <span class="badge bg-warning text-dark">Pendiente</span>
+        </div>
+        <div class="text-dim small">📱 ${o.telefono_cliente} · Pedido #${o.id}</div>
+        <div class="fw-bold mt-1">${money(o.total_pagar)} (${o.qty} boletas)</div>
+        <div class="text-dim small mt-2 break-word">🎟️ ${formattedNums}</div>
+        <div class="d-flex gap-2 mt-3">
+          <button class="btn btn-primary btn-sm flex-grow-1" onclick="approveOrder(${o.id})">✅ Aprobar</button>
+          <button class="btn btn-outline-danger btn-sm fw-bold" onclick="rejectOrder(${o.id})">❌ Liberar</button>
+        </div>
+      </div>
+    `;
+  }
+}
+
+async function approveOrder(orderId){
+  if(!confirm("¿Aprobar pago?")) return;
+
+  let {error} = await sb.from("orders").update({estado:"aprobado"}).eq("id", orderId);
+  if(error) return alert("Error: "+error.message);
+
+  const {error: e2} = await sb
+    .from("order_numbers")
+    .update({estado:"pagado"})
+    .eq("order_id", orderId);
+
+  if(e2) return alert("Error: "+e2.message);
+
+  alert("✅ Pago aprobado");
+  await loadPendingOrders();
+  await renderStats();
+}
+
+async function rejectOrder(orderId){
+  if(!confirm("¿Liberar números?")) return;
+
+  let {error} = await sb.from("orders").update({estado:"rechazado"}).eq("id", orderId);
+  if(error) return alert("Error: "+error.message);
+
+  const {error: e2} = await sb
+    .from("order_numbers")
+    .delete()
+    .eq("order_id", orderId);
+
+  if(e2) return alert("Error: "+e2.message);
+
+  alert("✅ Números liberados");
+  await loadPendingOrders();
+  await renderStats();
+}
+
+/***********************
+ * ADMIN: Rifas CRUD
+ ************************/
+async function adminLoadRafflesList(){
+  const box = document.getElementById("adminRafflesList");
+  box.innerHTML = "Cargando...";
+
+  const {data, error} = await sb
+    .from("raffles")
+    .select("*")
+    .order("created_at", {ascending:false});
+
+  if(error){
+    box.innerHTML = "Error cargando rifas";
+    return;
+  }
+
+  if(!data?.length){
+    box.innerHTML = `<div class="text-dim">No hay rifas.</div>`;
+    return;
+  }
+
+  box.innerHTML = "";
+  data.forEach(r=>{
+    const active = r.is_active ? `<span class="badge bg-success">Activa</span>` : `<span class="badge bg-secondary">Inactiva</span>`;
+    const premioCount = r.premium_numbers?.length || 0;
+    box.innerHTML += `
+      <div class="glass-card p-2 mb-2" style="cursor:pointer;" onclick="adminSelectRaffle(${r.id})">
+        <div class="d-flex justify-content-between align-items-center">
+          <div style="font-weight:900;">${r.nombre}</div>
+          ${active}
+        </div>
+        <div class="mini-muted">${r.total_numeros===1000?'000-999':'00-99'} · ${money(r.precio_unitario)}</div>
+        ${premioCount > 0 ?
+          `<div class="mini-muted"><i class="fa-solid fa-crown" style="color:var(--purple)"></i> ${premioCount} premio(s)</div>` : ''}
+      </div>
+    `;
+  });
+}
+
+async function adminSelectRaffle(raffleId){
+  adminSelectedRaffleId = raffleId;
+
+  const {data, error} = await sb.from("raffles").select("*").eq("id", raffleId).single();
+  if(error || !data) return alert("Error cargando rifa");
+
+  document.getElementById("adminEditDisabled").classList.add("d-none");
+  document.getElementById("adminEditForm").classList.remove("d-none");
+
+  document.getElementById("rf_nombre").value = data.nombre || "";
+  document.getElementById("rf_active").value = String(!!data.is_active);
+  document.getElementById("rf_total").value = String(data.total_numeros || 100);
+  document.getElementById("rf_precio").value = Number(data.precio_unitario || 0);
+
+  document.getElementById("rf_titulo").value = data.titulo || "";
+  document.getElementById("rf_desc").value = data.descripcion || "";
+
+  document.getElementById("rf_titulo_rifa").value = data.titulo_rifa || "";
+  document.getElementById("rf_premio").value = data.descripcion_premio || "";
+  document.getElementById("rf_fecha").value = data.fecha_sorteo || "";
+  document.getElementById("rf_loteria").value = data.loteria || "";
+
+  document.getElementById("rf_img_url").value = data.imagen_url || "";
+  document.getElementById("rf_img_file").value = "";
+
+  adminButtonsModel = [];
+  try { adminButtonsModel = JSON.parse(data.botones_json || "[]"); } catch(e){}
+  if(!adminButtonsModel.length){
+    adminButtonsModel = [
+      {qty:1,label:"x1"},
+      {qty:3,label:"x3"},
+      {qty:5,label:"x5"},
+      {qty:10,label:"x10"},
+    ];
+  }
+  adminButtonsRender();
+}
+
+async function adminCreateRaffle(){
+  if(!confirm("¿Crear nueva rifa con configuración inicial?")) return;
+
+  const base = {
+    is_active: true,
+    nombre: "Nueva Dinámica",
+    titulo: "SORTEO PREMIUM",
+    descripcion: "",
+    precio_unitario: 5000,
+    total_numeros: 100,
+    botones_json: JSON.stringify([{qty:1,label:"x1"},{qty:3,label:"x3"},{qty:5,label:"x5"},{qty:10,label:"x10"}])
+  };
+
+  const {data, error} = await sb.from("raffles").insert(base).select("*").single();
+  if(error) return alert("Error creando: " + error.message);
+
+  alert("✅ Rifa creada");
+  await adminLoadRafflesList();
+  await loadRaffles();
+  await adminSelectRaffle(data.id);
+}
+
+async function adminDeleteRaffle(){
+  if(!adminSelectedRaffleId) return alert("Selecciona una rifa");
+  if(!confirm("¿Eliminar rifa? (esto borra pedidos y números asociados)")) return;
+
+  const {error} = await sb.from("raffles").delete().eq("id", adminSelectedRaffleId);
+  if(error) return alert("Error: "+error.message);
+
+  alert("✅ Rifa eliminada");
+  adminSelectedRaffleId = null;
+
+  document.getElementById("adminEditForm").classList.add("d-none");
+  document.getElementById("adminEditDisabled").classList.remove("d-none");
+
+  await adminLoadRafflesList();
+  await loadRaffles();
+  if(raffles.length){
+    selectedRaffle = raffles[0];
+    renderRafflePicker();
+    await renderAll();
+  }
+}
+
+function adminButtonsRender(){
+  const div = document.getElementById("adminButtonsList");
+  div.innerHTML = "";
+
+  adminButtonsModel.forEach((b, idx)=>{
+    div.innerHTML += `
+      <div class="d-flex gap-2 align-items-center mb-2">
+        <input type="number" class="form-control" style="max-width:120px;" value="${b.qty}" onchange="adminButtonsChangeQty(${idx}, this.value)">
+        <input class="form-control" value="${b.label}" onchange="adminButtonsChangeLabel(${idx}, this.value)">
+        <button class="btn btn-outline-danger fw-bold" onclick="adminButtonsRemove(${idx})">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    `;
+  });
+}
+
+function adminButtonsAdd(){
+  if(adminButtonsModel.length >= 20) return alert("Máximo 20 botones");
+  adminButtonsModel.push({qty: 1, label: "x1"});
+  adminButtonsRender();
+}
+function adminButtonsRemove(i){
+  adminButtonsModel.splice(i,1);
+  adminButtonsRender();
+}
+function adminButtonsChangeQty(i, v){
+  adminButtonsModel[i].qty = Math.max(1, parseInt(v||1));
+}
+function adminButtonsChangeLabel(i, v){
+  adminButtonsModel[i].label = String(v||"").trim() || ("x"+adminButtonsModel[i].qty);
+}
+function adminButtonsResetDefault(){
+  adminButtonsModel = [
+    {qty:1,label:"x1"},
+    {qty:3,label:"x3"},
+    {qty:5,label:"x5"},
+    {qty:10,label:"x10"},
+  ];
+  adminButtonsRender();
+}
+
+function fileToBase64(file){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=> resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function adminSaveRaffle(){
+  if(!adminSelectedRaffleId) return alert("Selecciona una rifa");
+
+  const file = document.getElementById("rf_img_file").files?.[0] || null;
+  let base64Img = null;
+  if(file){
+    base64Img = await fileToBase64(file);
+  }
+
+  const payload = {
+    nombre: document.getElementById("rf_nombre").value.trim(),
+    is_active: document.getElementById("rf_active").value === "true",
+    total_numeros: parseInt(document.getElementById("rf_total").value),
+    precio_unitario: parseInt(document.getElementById("rf_precio").value || "0"),
+
+    titulo: document.getElementById("rf_titulo").value.trim(),
+    descripcion: document.getElementById("rf_desc").value || "",
+
+    titulo_rifa: document.getElementById("rf_titulo_rifa").value.trim(),
+    descripcion_premio: document.getElementById("rf_premio").value.trim(),
+    fecha_sorteo: document.getElementById("rf_fecha").value.trim(),
+    loteria: document.getElementById("rf_loteria").value.trim(),
+
+    imagen_url: document.getElementById("rf_img_url").value.trim() || null,
+    botones_json: JSON.stringify(adminButtonsModel)
+  };
+
+  if(base64Img){
+    payload.imagen_premio_base64 = base64Img;
+  }
+
+  const {error} = await sb.from("raffles").update(payload).eq("id", adminSelectedRaffleId);
+  if(error) return alert("Error guardando: " + error.message);
+
+  alert("✅ Rifa guardada");
+  await adminLoadRafflesList();
+
+  await loadRaffles();
+  const found = raffles.find(x=>x.id===adminSelectedRaffleId);
+  if(found){
+    selectedRaffle = found;
+    renderRafflePicker();
+    await renderAll();
+  }
+}
+
+/***********************
+ * ADMIN: PREMIUM NUMBERS
+ ************************/
+async function loadPremiumNumbersAdmin(){
+  if(!selectedRaffle?.id) return;
+
+  const {data, error} = await sb.from("raffles").select("premium_numbers").eq("id", selectedRaffle.id).single();
+  if(error){
+    console.error("Error cargando números premiados:", error);
+    adminPremiumNumbers = [];
+  } else {
+    adminPremiumNumbers = data?.premium_numbers || [];
+  }
+
+  renderPremiumNumbersAdmin();
+}
+
+function renderPremiumNumbersAdmin(){
+  const container = document.getElementById("premiumNumbersContainer");
+  const preview = document.getElementById("premiumPreview");
+  const addBtn = document.getElementById("addPremiumBtn");
+
+  addBtn.disabled = adminPremiumNumbers.length >= 4;
+  addBtn.innerHTML = adminPremiumNumbers.length >= 4
+    ? '<i class="fa-solid fa-ban me-2"></i> Límite alcanzado (4)'
+    : '<i class="fa-solid fa-plus me-2"></i> Agregar Número';
+
+  let inputsHTML = '';
+  adminPremiumNumbers.forEach((item, index) => {
+    inputsHTML += `
+      <div class="row g-2 align-items-center mb-3">
+        <div class="col-md-3">
+          <label class="small fw-bold ms-2">Número</label>
+          <input type="number" class="form-control premium-number-input"
+                 value="${item.number}"
+                 data-index="${index}"
+                 placeholder="Ej: 7"
+                 min="0"
+                 max="${selectedRaffle.total_numeros === 1000 ? 999 : 99}">
+        </div>
+        <div class="col-md-6">
+          <label class="small fw-bold ms-2">Premio / Valor</label>
+          <input type="text" class="form-control premium-prize-input"
+                 value="${item.prize}"
+                 data-index="${index}"
+                 placeholder="Ej: $100.000 ó Un iPhone 15">
+        </div>
+        <div class="col-md-3">
+          <label class="small fw-bold ms-2">Acción</label>
+          <button class="btn btn-outline-danger w-100" onclick="removePremiumNumberAdmin(${index})">
+            <i class="fa-solid fa-trash"></i> Eliminar
+          </button>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = inputsHTML || '<p class="text-center text-dim">No hay números premiados configurados. Agrega el primero.</p>';
+
+  let previewHTML = '';
+  if(adminPremiumNumbers.length === 0){
+    previewHTML = '<p class="text-center text-dim">No hay vista previa disponible</p>';
+  } else {
+    adminPremiumNumbers.forEach((item, index) => {
+      previewHTML += `
+        <div class="col-6">
+          <div class="premium-number-card">
+            <div class="premium-number">${formatNumber(item.number)}</div>
+            <div class="premium-prize">${item.prize}</div>
+            <div class="text-center mt-2">
+              <span class="premium-badge">Premio #${index + 1}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  }
+  preview.innerHTML = previewHTML;
+
+  document.querySelectorAll('.premium-number-input').forEach(input => {
+    input.addEventListener('change', function() {
+      const index = parseInt(this.dataset.index);
+      const value = parseInt(this.value) || 0;
+      const max = selectedRaffle.total_numeros === 1000 ? 999 : 99;
+
+      if(value < 0 || value > max) {
+        alert(`El número debe estar entre 0 y ${max}`);
+        this.value = adminPremiumNumbers[index].number;
+        return;
+      }
+
+      adminPremiumNumbers[index].number = value;
+      renderPremiumNumbersAdmin();
+    });
+  });
+
+  document.querySelectorAll('.premium-prize-input').forEach(input => {
+    input.addEventListener('change', function() {
+      const index = parseInt(this.dataset.index);
+      adminPremiumNumbers[index].prize = this.value;
+    });
+  });
+}
+
+function addPremiumNumber(){
+  if(adminPremiumNumbers.length >= 4) return alert("Máximo 4 números premiados por rifa");
+  adminPremiumNumbers.push({ number: 0, prize: "$50.000" });
+  renderPremiumNumbersAdmin();
+}
+
+function removePremiumNumberAdmin(index){
+  if(confirm("¿Eliminar este número premiado?")){
+    adminPremiumNumbers.splice(index, 1);
+    renderPremiumNumbersAdmin();
+  }
+}
+
+async function savePremiumNumbers(){
+  if(!selectedRaffle?.id) return alert("Selecciona una rifa primero");
+
+  const numbers = adminPremiumNumbers.map(p => p.number);
+  const uniqueNumbers = [...new Set(numbers)];
+  if(numbers.length !== uniqueNumbers.length){
+    alert("Hay números duplicados. Cada número premiado debe ser único.");
+    return;
+  }
+
+  const max = selectedRaffle.total_numeros === 1000 ? 999 : 99;
+  for(const item of adminPremiumNumbers){
+    if(item.number < 0 || item.number > max){
+      alert(`El número ${item.number} está fuera de rango (0-${max})`);
+      return;
+    }
+    if(!item.prize || item.prize.trim() === ""){
+      alert("Todos los premios deben tener una descripción");
+      return;
+    }
+  }
+
+  const {error} = await sb
+    .from("raffles")
+    .update({ premium_numbers: adminPremiumNumbers })
+    .eq("id", selectedRaffle.id);
+
+  if(error) return alert("Error guardando números premiados: " + error.message);
+
+  alert("✅ Números premiados guardados correctamente");
+  await refreshSelectedRaffleFromDB();
+  updatePremiumButtonIndicator();
+}
+
+/***********************
+ * WINNER + PRESENTATION
+ ************************/
+async function setWinnerNumber(){
+  if(!isAdmin) return alert("No autorizado");
+  const v = document.getElementById("winnerInput").value;
+  const n = parseInt(v);
+  if(Number.isNaN(n)) return alert("Número inválido");
+
+  const total = selectedRaffle.total_numeros === 1000 ? 1000 : 100;
+  if(n < 0 || n >= total) return alert("Ese número no existe en esta dinámica.");
+
+  const {error} = await sb.from("raffles").update({winner_number:n}).eq("id", selectedRaffle.id);
+  if(error) return alert("Error: " + error.message);
+
+  await refreshSelectedRaffleFromDB();
+  alert("✅ Ganador guardado");
+}
+
+async function clearWinnerNumber(){
+  if(!isAdmin) return alert("No autorizado");
+  const {error} = await sb.from("raffles").update({winner_number:null}).eq("id", selectedRaffle.id);
+  if(error) return alert("Error: " + error.message);
+
+  await refreshSelectedRaffleFromDB();
+  alert("✅ Ganador eliminado");
+}
+
+function openPresentationMode(){
+  const winner = selectedRaffle.winner_number;
+  document.getElementById("presRaffleName").innerText = selectedRaffle.nombre || "Dinámicas";
+  document.getElementById("presWinner").innerText = winner === null || winner === undefined ? "---" : formatNumber(winner);
+  document.getElementById("presStats").innerText = document.getElementById("statsText").innerText;
+
+  new bootstrap.Modal(document.getElementById("presentationModal")).show();
+
+  setTimeout(()=>{
+    const el = document.querySelector("#presentationModal .modal-content");
+    if(el && el.requestFullscreen) el.requestFullscreen().catch(()=>{});
+  }, 400);
+}
+
+console.log("SB Dinámicas Premium - Compra dentro de botón Comprar ✅");
+  </script>
+</body>
+</html>
